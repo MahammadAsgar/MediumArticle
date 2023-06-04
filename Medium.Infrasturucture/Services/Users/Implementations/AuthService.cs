@@ -63,8 +63,8 @@ namespace Medium.Infrasturucture.Services.Users.Implementations
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginUserDto.Password, false);
             if (result.Succeeded) //Success Authentication
             {
-                var claims = await _userManager.GetClaimsAsync(user);
-                Token token = _tokenHandler.CreateAccessToken(user);
+                //var claims = await _userManager.GetClaimsAsync(user);
+                Token token =await _tokenHandler.CreateAccessToken(user);
                 return Response<Token>.Success(token);
             }
             return Response<Token>.Fail("password is incorrect");

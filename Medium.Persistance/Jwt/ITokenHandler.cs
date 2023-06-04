@@ -4,6 +4,6 @@ namespace Medium.Persistance.Jwt
 {
     public interface ITokenHandler
     {
-        Token CreateAccessToken(AppUser user);
+        Task<Token> CreateAccessToken(AppUser user);
     }
 }

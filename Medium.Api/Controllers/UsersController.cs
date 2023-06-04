@@ -2,6 +2,7 @@
 using Medium.Infrasturucture.Dtos.Entities.Get;
 using Medium.Infrasturucture.Dtos.Users.Get;
 using Medium.Infrasturucture.Services.Users.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing.Template;
@@ -11,10 +12,12 @@ namespace Medium.Api.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         readonly IUserService _userService;
         readonly IAuthService _authService;
+
         public UsersController(IAuthService authService, IUserService userService)
         {
             _authService = authService;
@@ -22,6 +25,7 @@ namespace Medium.Api.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Admin, User")]
         public async Task<ActionResult<Response<NoDataDto>>> LikeArticle(int articleId)
         {
             var user = await _authService.GetCurrentUser();
@@ -30,6 +34,7 @@ namespace Medium.Api.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Admin, User")]
         public async Task<ActionResult<Response<NoDataDto>>> FollowUser(int userId)
         {
             var user = await _authService.GetCurrentUser();
@@ -38,6 +43,7 @@ namespace Medium.Api.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Admin, User")]
         public async Task<ActionResult<Response<NoDataDto>>> UnFollowUser(int userId)
         {
             var user = await _authService.GetCurrentUser();
@@ -46,6 +52,7 @@ namespace Medium.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin, User")]
         public async Task<ActionResult<Response<IEnumerable<GetUserOnList>>>> Followers(int userId)
         {
             var response = await _userService.Followers(userId);
@@ -53,6 +60,7 @@ namespace Medium.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin, User")]
         public async Task<ActionResult<Response<IEnumerable<GetUserOnList>>>> Followings(int userId)
         {
             var response = await _userService.Followings(userId);
@@ -60,6 +68,7 @@ namespace Medium.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin, User")]
         public async Task<ActionResult<Response<IEnumerable<GetArticleDto>>>> LikedArticles()
         {
             var user = await _authService.GetCurrentUser();
@@ -68,6 +77,7 @@ namespace Medium.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin, User")]
         public async Task<ActionResult<Response<IEnumerable<GetTagDto>>>> UsedTags()
         {
             var user = await _authService.GetCurrentUser();
@@ -76,6 +86,7 @@ namespace Medium.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin, User")]
         public async Task<ActionResult<Response<IEnumerable<GetTagDto>>>> SelectedTags()
         {
             var user = await _authService.GetCurrentUser();
@@ -84,13 +95,12 @@ namespace Medium.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin, User")]
         public async Task<ActionResult<Response<IEnumerable<GetArticleTagsDto>>>> ArticlesByUser()
         {
             var user = await _authService.GetCurrentUser();
             var response = await _userService.ArticlesByUser(user);
             return Ok(response);
         }
-
-
     }
 }

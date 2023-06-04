@@ -2,6 +2,7 @@
 using Medium.Infrasturucture.Dtos.Users.Post;
 using Medium.Infrasturucture.Services.Users.Abstractions;
 using Medium.Persistance.Jwt;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Result;
 

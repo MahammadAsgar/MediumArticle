@@ -18,18 +18,20 @@ namespace Medium.Persistance.Jwt
             _userManager = userManager;
         }
 
-        public Token CreateAccessToken(AppUser user)
+        public async Task<Token> CreateAccessToken(AppUser user)
         {
             Token token = new Token();
             SymmetricSecurityKey symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Token:SecurityKey"]));
             SigningCredentials signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
             DateTime expireDate = DateTime.UtcNow.AddHours(Double.Parse(_configuration["Token:ExpireDate"]));
+            var claims = await SetClaims(user);
             JwtSecurityToken jwtSecurityToken = new JwtSecurityToken(
                 audience: _configuration["Token:Audience"],
                 issuer: _configuration["Token:Issure"],
                 expires: expireDate,
                 signingCredentials: signingCredentials,
-                notBefore: DateTime.UtcNow
+                notBefore: DateTime.UtcNow,
+                claims: claims
                 );
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
             token.AccessToken = tokenHandler.WriteToken(jwtSecurityToken);

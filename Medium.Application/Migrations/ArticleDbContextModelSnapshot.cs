@@ -22,21 +22,6 @@ namespace Medium.Application.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("AppUserAppUser", b =>
-                {
-                    b.Property<int>("FollewersId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FollowingsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("FollewersId", "FollowingsId");
-
-                    b.HasIndex("FollowingsId");
-
-                    b.ToTable("AppUserAppUser");
-                });
-
             modelBuilder.Entity("ArticleTag", b =>
                 {
                     b.Property<int>("ArticlesId")
@@ -199,14 +184,14 @@ namespace Medium.Application.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "34b690aa-55d0-456e-aced-f02628c1e7f7",
+                            ConcurrencyStamp = "49380f11-3040-4fe9-80a4-43dd6715afc6",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "5669c972-ce56-4636-b1a3-ec45d7382db8",
+                            ConcurrencyStamp = "b2f3bbee-8ffc-4542-a909-1ad9367c3f88",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -389,21 +374,6 @@ namespace Medium.Application.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("AppUserAppUser", b =>
-                {
-                    b.HasOne("Medium.Domain.Users.AppUser", null)
-                        .WithMany()
-                        .HasForeignKey("FollewersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Medium.Domain.Users.AppUser", null)
-                        .WithMany()
-                        .HasForeignKey("FollowingsId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("ArticleTag", b =>

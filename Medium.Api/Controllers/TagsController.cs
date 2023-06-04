@@ -8,6 +8,7 @@ using Result;
 namespace Medium.Api.Controllers
 {
     [Route("api/[controller]/[action]")]
+    [Authorize]
     [ApiController]
     public class TagsController : ControllerBase
     {
@@ -18,7 +19,7 @@ namespace Medium.Api.Controllers
         }
 
         [HttpPost]
-     //   [Authorize(Roles ="Admin, User")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Response<GetTagDto>>> Tags([FromForm] AddTagDto tagDto)
         {
             var response = await _tagService.AddTag(tagDto);
@@ -26,12 +27,14 @@ namespace Medium.Api.Controllers
         }
 
         [HttpPut("id")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Response<GetTagDto>>> Tags([FromForm] AddTagDto tagDto, int id)
         {
             var response = await _tagService.UpdateTag(tagDto, id);
             return Ok(response);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("id")]
         public async Task<ActionResult<Response<GetTagDto>>> Tags(int id)
         {
@@ -39,8 +42,9 @@ namespace Medium.Api.Controllers
             return Ok(response);
         }
 
-
         [HttpGet("id")]
+        [Authorize(Roles = "Admin, User")]
+
         public async Task<ActionResult<Response<GetTagDto>>> Tag(int id)
         {
             var response = await _tagService.GetTag(id);
@@ -48,11 +52,11 @@ namespace Medium.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin, User")]
         public async Task<ActionResult<Response<IEnumerable<GetTagDto>>>> Tags()
         {
             var response = await _tagService.GetTags();
             return Ok(response);
         }
-
     }
 }

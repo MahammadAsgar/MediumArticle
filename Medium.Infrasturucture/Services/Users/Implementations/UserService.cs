@@ -41,7 +41,7 @@ namespace Medium.Infrasturucture.Services.Users.Implementations
         public async Task<Response<IEnumerable<GetUserOnList>>> Followers(int userId)
         {
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
-            var followers = user.Follewers.ToList();
+            var followers = user.Followers.ToList();
             if (followers.Count > 0)
             {
                 return Response<IEnumerable<GetUserOnList>>.Success(_mapper.Map<IEnumerable<GetUserOnList>>(followers));
@@ -52,7 +52,8 @@ namespace Medium.Infrasturucture.Services.Users.Implementations
         public async Task<Response<IEnumerable<GetUserOnList>>> Followings(int userId)
         {
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
-            var followings = user.Followings.ToList();
+            var followings = new List<int>();
+            followings = user.Followings.ToList();
             if (followings.Count > 0)
             {
                 return Response<IEnumerable<GetUserOnList>>.Success(_mapper.Map<IEnumerable<GetUserOnList>>(followings));
@@ -63,10 +64,12 @@ namespace Medium.Infrasturucture.Services.Users.Implementations
         public async Task<Response<NoDataDto>> FollowUser(AppUser user, int targetUser)
         {
             var target = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == targetUser);
-            user.Followings = new List<AppUser>();
-            user.Followings.Add(target);
-            target.Follewers = new List<AppUser>();
-            target.Follewers.Add(user);
+            user.Followings = new List<int>();
+            user.Followings.Add(target.Id);
+            target.Followers = new List<int>();
+            target.Followers.Add(target.Id);
+            await _userManager.UpdateAsync(user);
+            _unitOfWork.CommitAsync();
             return Response<NoDataDto>.Success("Successfull add follewers");
         }
 
@@ -76,7 +79,7 @@ namespace Medium.Infrasturucture.Services.Users.Implementations
             article.Likes++;
             user.LikedArticles = new List<Article>();
             user.LikedArticles.Add(article);
-            await _unitOfWork.CommitAsync();
+            await _userManager.UpdateAsync(user);
             return Response<NoDataDto>.Success("Successfull Liked");
         }
 
@@ -103,10 +106,11 @@ namespace Medium.Infrasturucture.Services.Users.Implementations
         public async Task<Response<NoDataDto>> UnFollowUser(AppUser user, int targetUser)
         {
             var target = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == targetUser);
-            user.Followings = new List<AppUser>();
-            user.Followings.Remove(target);
-            target.Follewers = new List<AppUser>();
-            target.Follewers.Remove(user);
+            user.Followings = new List<int>();
+            user.Followings.Remove(target.Id);
+            target.Followers = new List<int>();
+            target.Followers.Remove(user.Id);
+            await _userManager.UpdateAsync(user);
             return Response<NoDataDto>.Success("Successfull remove follewer");
         }
 

@@ -39,10 +39,12 @@ namespace Medium.Infrasturucture.Services.Entities.Implementations
             return Response<GetArticleDto>.Success(_mapper.Map<GetArticleDto>(article));
         }
 
-        public async Task<Response<NoDataDto>> DeleteArticle(int id)
+        public async Task<Response<NoDataDto>> DeleteArticle(int id, AppUser user)
         {
+
             var article = await _genericRepository.GetByIdAsync(id);
-            if (article != null)
+            user.Articles = new List<Article>();
+            if (article != null && user.Articles.Contains(article))
             {
                 _genericRepository.Remove(article);
                 _unitOfWork.Commit();
@@ -71,29 +73,52 @@ namespace Medium.Infrasturucture.Services.Entities.Implementations
             return Response<IEnumerable<GetArticleDto>>.Fail("No article found");
         }
 
-        //public async Task<Response<IEnumerable<GetArticleDto>>> GetArticleByOwner(int userId)
-        //{
-        //    var articles =  await _genericRepository.Where(x => x.OwnerId == userId).ToListAsync();
-        //    if (articles!=null)
-        //    {
-        //        return Response<IEnumerable<GetArticleDto>>.Success(_mapper.Map<IEnumerable<GetArticleDto>>(articles));
-        //    }
-        //    return Response<IEnumerable<GetArticleDto>>.Fail("Data fot found");
-        //}
+        public async Task<Response<IEnumerable<GetArticleDto>>> GetArticlesByOwner(int userId)
+        {
+            var user= await _userManager.Users.FirstOrDefaultAsync(x=>x.Id==userId);
+            if (user.Articles.Any())
+            {
+                return Response<IEnumerable<GetArticleDto>>.Success(_mapper.Map<IEnumerable<GetArticleDto>>(user.Articles));
+            }
+            return Response<IEnumerable<GetArticleDto>>.Fail("No Data found");
+        }
 
         public async Task<Response<IEnumerable<GetArticleDto>>> GetArticlesWhere(IEnumerable<int> ids)
         {
             var articles = await _genericRepository.Where(x => x.Tags.All(y => ids.Contains(y.Id))).ToListAsync();
-            if (articles!=null)
+            if (articles != null)
             {
                 return Response<IEnumerable<GetArticleDto>>.Success(_mapper.Map<IEnumerable<GetArticleDto>>(articles));
             }
             return Response<IEnumerable<GetArticleDto>>.Fail("No data found");
-        } 
+        }
 
-        public Task<Response<GetArticleDto>> UpdateArticle(AddArticleDto addArticleDto, int id)
+        public async Task<Response<GetArticleDto>> UpdateArticle(AddArticleDto addArticleDto, int id, AppUser user)
         {
-            throw new NotImplementedException();
+            var article = await _genericRepository.GetByIdAsync(id);
+            user.Articles = new List<Article>();
+            if (article != null && user.Articles.Contains(article))
+            {
+                if (!string.IsNullOrEmpty(addArticleDto.Title))
+                {
+                    article.Title = addArticleDto.Title;
+                }
+
+                if (!string.IsNullOrEmpty(addArticleDto.Content))
+                {
+                    article.Content = addArticleDto.Content;
+                }
+
+                if (addArticleDto.TagIds.Any())
+                {
+                    
+                }
+                 _genericRepository.Update(article);
+                _unitOfWork.Commit();
+
+                return Response<GetArticleDto>.Success(_mapper.Map<GetArticleDto>(article));
+            }
+            return Response<GetArticleDto>.Fail("data not found");
         }
     }
 }

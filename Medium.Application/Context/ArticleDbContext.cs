@@ -3,6 +3,7 @@ using Medium.Domain.Entities;
 using Medium.Domain.Users;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace Medium.Application.Context
 {
