@@ -184,14 +184,14 @@ namespace Medium.Application.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "42b97488-9154-45fa-8893-4ccfbfa4762e",
+                            ConcurrencyStamp = "5afaf0aa-92ce-441d-af1f-c9fc0d353b7b",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "56db2a77-9c26-4cec-a310-5286e1050b1b",
+                            ConcurrencyStamp = "90889d39-c08a-4e86-9044-067edf298218",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -297,10 +297,6 @@ namespace Medium.Application.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("FollowerId");
-
-                    b.HasIndex("FollowingId");
 
                     b.ToTable("FollowUsers");
                 });
@@ -454,21 +450,6 @@ namespace Medium.Application.Migrations
                     b.HasOne("Medium.Domain.Users.AppUser", null)
                         .WithMany("UsedTags")
                         .HasForeignKey("AppUserId1");
-                });
-
-            modelBuilder.Entity("Medium.Domain.Users.FollowUser", b =>
-                {
-                    b.HasOne("Medium.Domain.Users.AppUser", "Follower")
-                        .WithMany()
-                        .HasForeignKey("FollowerId");
-
-                    b.HasOne("Medium.Domain.Users.AppUser", "Following")
-                        .WithMany()
-                        .HasForeignKey("FollowingId");
-
-                    b.Navigation("Follower");
-
-                    b.Navigation("Following");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
