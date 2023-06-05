@@ -24,26 +24,34 @@ namespace Medium.Infrasturucture.Services.Users.Implementations
         readonly UserManager<AppUser> _userManager;
         readonly IGenericRepository<Article> _articleRepository;
         readonly IGenericRepository<Tag> _tagRepository;
+        readonly IGenericRepository<FollowUser> _fllowUserRepository;
         readonly IMapper _mapper;
         // readonly IHttpContextAccessor _httpContextAccessor;
 
         public UserService(IUnitOfWork unitOfWork, UserManager<AppUser> userManager,
             IGenericRepository<Article> articleRepository, IGenericRepository<Tag> tagRepository,
-            IMapper mapper)
+            IMapper mapper, IGenericRepository<FollowUser> fllowUserRepository)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _articleRepository = articleRepository;
             _tagRepository = tagRepository;
             _mapper = mapper;
+            _fllowUserRepository=fllowUserRepository;
         }
 
         public async Task<Response<IEnumerable<GetUserOnList>>> Followers(int userId)
         {
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
-            var followers = user.Followers.ToList();
-            if (followers.Count > 0)
+            var followUser = await _fllowUserRepository.Where(x => x.Following.Id == userId).ToListAsync();
+
+            if (followUser.Count > 0)
             {
+                var followers = new List<AppUser>();
+                foreach (var item in followUser)
+                {
+                    followers.Add(item.Follower);
+                }
                 return Response<IEnumerable<GetUserOnList>>.Success(_mapper.Map<IEnumerable<GetUserOnList>>(followers));
             }
             return Response<IEnumerable<GetUserOnList>>.Success("No Followers");
@@ -52,10 +60,15 @@ namespace Medium.Infrasturucture.Services.Users.Implementations
         public async Task<Response<IEnumerable<GetUserOnList>>> Followings(int userId)
         {
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
-            var followings = new List<int>();
-            followings = user.Followings.ToList();
-            if (followings.Count > 0)
+            var followUser = await _fllowUserRepository.Where(x => x.Follower.Id == userId).ToListAsync();
+            var followings = new List<AppUser>();
+
+            if (followUser.Count > 0)
             {
+                foreach (var item in followUser)
+                {
+                    followings.Add(item.Following);
+                }
                 return Response<IEnumerable<GetUserOnList>>.Success(_mapper.Map<IEnumerable<GetUserOnList>>(followings));
             }
             return Response<IEnumerable<GetUserOnList>>.Success("No Followings");
@@ -64,12 +77,17 @@ namespace Medium.Infrasturucture.Services.Users.Implementations
         public async Task<Response<NoDataDto>> FollowUser(AppUser user, int targetUser)
         {
             var target = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == targetUser);
-            user.Followings = new List<int>();
-            user.Followings.Add(target.Id);
-            target.Followers = new List<int>();
-            target.Followers.Add(target.Id);
-            await _userManager.UpdateAsync(user);
-            _unitOfWork.CommitAsync();
+            //user.Followings = new List<int>();
+            //user.Followings.Add(target.Id);
+            //target.Followers = new List<int>();
+            //target.Followers.Add(target.Id);
+            //await _userManager.UpdateAsync(user);
+            //_unitOfWork.CommitAsync();
+            var followUser = new FollowUser();
+            followUser.Follower = user;
+            followUser.Following = target;
+            await _fllowUserRepository.AddAsync(followUser);
+            await _unitOfWork.CommitAsync();
             return Response<NoDataDto>.Success("Successfull add follewers");
         }
 
@@ -106,11 +124,14 @@ namespace Medium.Infrasturucture.Services.Users.Implementations
         public async Task<Response<NoDataDto>> UnFollowUser(AppUser user, int targetUser)
         {
             var target = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == targetUser);
-            user.Followings = new List<int>();
-            user.Followings.Remove(target.Id);
-            target.Followers = new List<int>();
-            target.Followers.Remove(user.Id);
-            await _userManager.UpdateAsync(user);
+            //user.Followings = new List<int>();
+            //user.Followings.Remove(target.Id);
+            //target.Followers = new List<int>();
+            //target.Followers.Remove(user.Id);
+            //await _userManager.UpdateAsync(user);
+            var userFollow = await _fllowUserRepository.Where(x => x.Follower.Id == user.Id && x.Following.Id == target.Id).ToListAsync();
+            _fllowUserRepository.Remove(userFollow.FirstOrDefault());
+            _unitOfWork.Commit();
             return Response<NoDataDto>.Success("Successfull remove follewer");
         }
 

@@ -20,5 +20,6 @@ namespace Medium.Application.Context
         }
         public DbSet<Article> Articles { get; set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<FollowUser> FollowUsers { get; set; }
     }
 }

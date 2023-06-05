@@ -27,7 +27,9 @@ namespace Medium.Infrasturucture.Mappings
                 //.ForMember(x=>x.UserNameOrEmail, y=>y.MapFrom(z=>z.Email))
                 //.ForMember(x=>x.UserNameOrEmail, y=>y.MapFrom(z=>z.UserName))
                 .ReverseMap();
-            CreateMap<AppUser, GetUserOwnInfo>().ReverseMap();
+            CreateMap<AppUser, GetUserOwnInfo>()
+              //  .ForMember(x=>x.Follewers, y=>y.MapFrom(z=>z.Followers.Select()))
+                .ReverseMap();
             CreateMap<AppUser, GetUserAll>().ReverseMap();
             CreateMap<AppUser, GetUserOnList>().ReverseMap();
             #endregion

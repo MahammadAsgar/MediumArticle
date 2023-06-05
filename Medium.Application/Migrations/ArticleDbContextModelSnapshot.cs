@@ -184,14 +184,14 @@ namespace Medium.Application.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "49380f11-3040-4fe9-80a4-43dd6715afc6",
+                            ConcurrencyStamp = "42b97488-9154-45fa-8893-4ccfbfa4762e",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "b2f3bbee-8ffc-4542-a909-1ad9367c3f88",
+                            ConcurrencyStamp = "56db2a77-9c26-4cec-a310-5286e1050b1b",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -271,6 +271,38 @@ namespace Medium.Application.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Medium.Domain.Users.FollowUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("FollowerId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("FollowingId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FollowerId");
+
+                    b.HasIndex("FollowingId");
+
+                    b.ToTable("FollowUsers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -422,6 +454,21 @@ namespace Medium.Application.Migrations
                     b.HasOne("Medium.Domain.Users.AppUser", null)
                         .WithMany("UsedTags")
                         .HasForeignKey("AppUserId1");
+                });
+
+            modelBuilder.Entity("Medium.Domain.Users.FollowUser", b =>
+                {
+                    b.HasOne("Medium.Domain.Users.AppUser", "Follower")
+                        .WithMany()
+                        .HasForeignKey("FollowerId");
+
+                    b.HasOne("Medium.Domain.Users.AppUser", "Following")
+                        .WithMany()
+                        .HasForeignKey("FollowingId");
+
+                    b.Navigation("Follower");
+
+                    b.Navigation("Following");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
